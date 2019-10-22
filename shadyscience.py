@@ -1,5 +1,6 @@
 import tweepy
 import markovify
+import time
 
 # OAuth Authentication is the preferred way of authenticating with Twitter.
 
@@ -14,23 +15,27 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-#print(api.me().name) TODO
+# If the authentication was successful, name of the account will be printed
+print("Account: " + api.me().name)
 
 # Get raw text as strings
 with open("funfacts.txt") as f:
     text = f.read()
 
 # Build the Markov Chain model
-# Becauase the training data are made up of sentences separated with newlines,
+# Because the training data are made up of sentences separated with newlines,
 # we use the markovify.NewlineText class instead of the markovify.Text class
 text_model = markovify.NewlineText(text)
 
-# Print five randomly-generated sentences
-for i in range(5):
-    print(text_model.make_sentence())
+while True:
 
-# Print three randomly-generated sentences of no more than 200 characters
-for i in range(3):
-    print(text_model.make_short_sentence(200))
+    # Generate a tweet
+    status = text_model.make_sentence() + "."
+    print(status)
 
-#api.update_status(status = 'Updating using OAuth authentication via Tweepy!')
+    # If the app settings are set to r+w then this will tweet out the generated
+    # text to the account's timline
+    api.update_status(status)
+
+    # Set the bot to tweet every x minutes
+    time.sleep(1800)
